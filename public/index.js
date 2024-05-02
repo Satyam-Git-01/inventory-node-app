@@ -1,81 +1,59 @@
 function clearList() {
-    const itemList = document.getElementById("item_list");
-    itemList.textContent = "";
-  }
-  function fetchData() {
-    const itemList = document.getElementById("item_list");
-    axios
-      .get("https://crudcrud.com/api/43137b4d837d4e4b8ebdc89b6046578f/inventory")
-      .then((response) => {
-        clearList();
-        const arr = response.data;
-        for (let x of arr) {
-          const li = document.createElement("li");
-          li.classList.add("list-group-item");
-          li.innerHTML = `${x.itemName} ${x.itemDesc} ${x.price} ${x.quantity} <button class="btn btn-primary" onclick="edit('${x._id}','1')">Buy 1</buttton>   <button class="btn btn-primary"onclick="edit('${x._id}','2')">Buy 2</buttton>    <button class="btn btn-primary"onclick="edit('${x._id}','3')">Buy 3</buttton>`;
-          itemList.appendChild(li);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  function edit(id, quantity) {
-    axios
-      .get(
-        `https://crudcrud.com/api/43137b4d837d4e4b8ebdc89b6046578f/inventory/${id}`
-      )
-      .then((r) => {
-        console.log(r.data);
-        let obj = {
-          itemName: r.data.itemName,
-          itemDesc: r.data.itemDesc,
-          price: r.data.price,
-          quantity: r.data.quantity - quantity,
-        };
-        console.log(obj);
-        axios
-          .put(
-            `https://crudcrud.com/api/43137b4d837d4e4b8ebdc89b6046578f/inventory/${id}`,
-            obj
-          )
-          .then((response) => {
-            clearList();
-            fetchData();
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      });
-  }
-  fetchData();
-  function addItem(event) {
-    event.preventDefault();
-    const itemName = event.target.item_name.value;
-    const itemDesc = event.target.item_description.value;
-    const price = event.target.item_price.value;
-    const quantity = event.target.item_quantity.value;
-    const obj = {
-      itemName,
-      itemDesc,
-      price,
-      quantity,
-    };
-    postData(obj);
-    clearList();
-    fetchData();
-  }
-  function postData(Obj) {
-    axios
-      .post(
-        "https://crudcrud.com/api/43137b4d837d4e4b8ebdc89b6046578f/inventory",
-        Obj
-      )
-      .then((response) => {
-        fetchData();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-  
+  const itemList = document.getElementById("item_list");
+  itemList.textContent = "";
+}
+function fetchData() {
+  const itemList = document.getElementById("item_list");
+  axios
+    .get("http://localhost:4500/products")
+    .then((response) => {
+      clearList();
+      const arr = response.data;
+      for (let x of arr) {
+        const li = document.createElement("li");
+        li.classList.add("list-group-item");
+        li.innerHTML = `${x.itemname} ${x.description} ${x.price} ${x.quantity} <button class="btn btn-primary" onclick="edit('${x.id}','1')">Buy 1</buttton>   <button class="btn btn-primary"onclick="edit('${x.id}','2')">Buy 2</buttton>    <button class="btn btn-primary"onclick="edit('${x.id}','3')">Buy 3</buttton>`;
+        itemList.appendChild(li);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+function edit(id, number) {
+  axios
+    .put(`http://localhost:4500/products/edit/${id}/${number}`)
+    .then((resp) => {
+      console.log(resp);
+      fetchData()
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+fetchData();
+function addItem(event) {
+  event.preventDefault();
+  const itemname = event.target.item_name.value;
+  const description = event.target.item_description.value;
+  const price = event.target.item_price.value;
+  const quantity = event.target.item_quantity.value;
+  const obj = {
+    itemname,
+    description,
+    price,
+    quantity,
+  };
+  postData(obj);
+}
+function postData(Obj) {
+  axios
+    .post("http://localhost:4500/products/add-product", Obj)
+    .then((response) => {
+      fetchData();
+      console.log(response);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
