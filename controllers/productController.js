@@ -1,22 +1,19 @@
-const { where } = require("sequelize");
-const sequelize = require("../models/productModel");
+const ProductModel = require("../models/productModel");
 
 exports.GetAllProducts = (req, res, next) => {
-  sequelize
-    .findAll()
+  ProductModel.findAll()
     .then((results) => {
       res.status(200).json(results);
     })
     .catch((err) => console.log(err));
 };
-exports.PostData = (req, res, next) => {
-  sequelize
-    .create({
-      itemname: req.body.itemname,
-      description: req.body.description,
-      price: req.body.price,
-      quantity: req.body.quantity,
-    })
+exports.AddProduct = (req, res, next) => {
+  ProductModel.create({
+    itemname: req.body.itemname,
+    description: req.body.description,
+    price: req.body.price,
+    quantity: req.body.quantity,
+  })
     .then((result) => {
       res.status(200).json(result);
     })
@@ -24,8 +21,15 @@ exports.PostData = (req, res, next) => {
 };
 
 exports.UpdateProduct = async (req, res, next) => {
-  const { id, number } = req.params;
-  const product = await sequelize.findOne({ where: { id: id } });
-  await product.decrement(["quantity"], { by: number });
-  res.send("Ok");
+  try {
+    const { id, number } = req.params;
+    const product = await ProductModel.findOne({ where: { id: id } });
+    if(product.quantity-number<0){
+      return res.status(201).send("Cant Update Item Quantity is minimal")
+    }
+    await product.decrement(["quantity"], { by: number });
+    res.send("Updated SucccessFully");
+  } catch (err) {
+    res.send("Error Occured");
+  }
 };

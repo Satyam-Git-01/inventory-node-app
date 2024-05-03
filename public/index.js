@@ -24,6 +24,9 @@ function edit(id, number) {
   axios
     .put(`http://localhost:4500/products/edit/${id}/${number}`)
     .then((resp) => {
+      if(resp.status===201){
+        window.alert('Cant Update')
+      }
       console.log(resp);
       fetchData()
     })
